@@ -25,13 +25,19 @@ You can install Homebrew by following their [instructions](https://brew.sh/).
 Example Playbook
 ----------------
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
-
 ```yaml
 - hosts: localhost
   connection: local
   roles:
     - role: IanTaylorFB.git
+```
+
+Source Files
+------------
+
+Source files will be copied from a mounted volume named `Shuroo` if they exist. This method allows convenient use of a flashdrive or mounted network disk containing dotfiles, configuration files and secrets. This role will copy the following files if they are found:
+```zsh
+/Volumes/Shuroo/.gitconfig
 ```
 
 License

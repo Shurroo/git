@@ -26,4 +26,17 @@
   when:
     - homebrew_brew.stat.exists
 
+- name: Register source gitconfig
+  stat:
+    path: /Volumes/Shuroo/.gitconfig
+  register: source_gitconfig
+
+- name: Copy source gitconfig
+  become: false
+  copy:
+    src: "/Volumes/Shuroo/.gitconfig"
+    dest: "~/.gitconfig"
+  when:
+    source_gitconfig.stat.exists
+
 ...
