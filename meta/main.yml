@@ -1,6 +1,6 @@
 galaxy_info:
   author: Ian Taylor (IanTaylorFB)
-  description: new role description
+  description: Install git on macOS using Homebrew and perform basic configuration
   company: FlyingBinary Ltd
 
   # If the issue tracker for your role is not on github, uncomment the
