@@ -13,7 +13,12 @@ Requirements
 Role Variables
 --------------
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+The global Git user name and email may be set by including these values in the playbook, for example
+```yaml
+git_user_name: Groot
+git_user_email: groot@galaxyguardians.org
+```
+If either or both the values are omitted, no action will be taken.
 
 Dependencies
 ------------
@@ -30,6 +35,8 @@ Example Playbook
   connection: local
   roles:
     - role: IanTaylorFB.git
+      git_user_name: Groot
+      git_user_email: groot@galaxyguardians.org
 ```
 
 Source Files
@@ -40,6 +47,12 @@ Source files will be copied from a mounted volume named `Shuroo` if they exist. 
 /Volumes/Shuroo/.gitconfig
 ```
 
+Project Name
+------------
+
+The project was originally inspired by [Roderik van der Veer](https://github.com/roderik)'s [Superlumic](https://github.com/superlumic/superlumic) project. When I started on a replacement, I searched for a name with some meaning like "launch", "fire up", "bootstrap" or similar. I eventually settled on Hindi "shuroo" (शुरू). [Google Translate](https://translate.google.com/?sl=en&tl=hi&text=begin&op=translate) tells me "shuroo" means "begin", so this works nicely.
+
+
 License
 -------
 
@@ -48,6 +61,4 @@ BSD
 Author Information
 ------------------
 
-Ian Taylor (IanTaylorFB)
-
-FlyingBinary Ltd
+Ian Taylor ([IanTaylorFB](https://github.com/IanTaylorFB)), Co-Founder and CTO at [FlyingBinary Ltd](https://flyingbinary.com).

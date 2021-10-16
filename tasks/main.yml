@@ -31,12 +31,43 @@
     path: /Volumes/Shuroo/.gitconfig
   register: source_gitconfig
 
+- name: Register taraget gitconfig
+  stat:
+    path: ~/.gitconfig
+  register: target_gitconfig
+
 - name: Copy source gitconfig
   become: false
   copy:
     src: "/Volumes/Shuroo/.gitconfig"
     dest: "~/.gitconfig"
   when:
-    source_gitconfig.stat.exists
+    - source_gitconfig.stat.exists
+    - not target_gitconfig.stat.exists
+
+- name: Register git user name
+  become: false
+  shell: git config --global --get user.name
+  register: git_user_name_result
+  changed_when: false
+  failed_when: false
+
+- name: Register git user email
+  shell: git config --global --get user.email
+  register: git_user_email_result
+  changed_when: false
+  failed_when: false
+
+- name: Set git user name
+  shell: git config --global user.name "{{git_user_name}}"
+  when:
+    - git_user_name
+    - git_user_name_result.stdout != git_user_name
+
+- name: Set git user email
+  shell: git config --global user.email "{{git_user_email}}"
+  when:
+    - git_user_email
+    - git_user_email_result.stdout != git_user_email
 
 ...

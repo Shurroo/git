@@ -1,2 +1,7 @@
 ---
-# defaults file for new role
+
+# Default values are empty
+git_user_name:
+git_user_email:
+
+...
