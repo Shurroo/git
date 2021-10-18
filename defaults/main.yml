@@ -1,6 +1,8 @@
 ---
 
 # Default values are empty
+# Existing values on the target machine are NOT deleted, they are only
+# set when a value is provided in the playbook.
 git_user_name:
 git_user_email:
 

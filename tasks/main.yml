@@ -24,6 +24,7 @@
     - git
     - git-extras
   when:
+    - false  # Added to speed up testing only - remove before commit
     - homebrew_brew.stat.exists
 
 - name: Register source gitconfig
@@ -31,7 +32,7 @@
     path: /Volumes/Shuroo/.gitconfig
   register: source_gitconfig
 
-- name: Register taraget gitconfig
+- name: Register target gitconfig
   stat:
     path: ~/.gitconfig
   register: target_gitconfig
@@ -39,8 +40,8 @@
 - name: Copy source gitconfig
   become: false
   copy:
-    src: "/Volumes/Shuroo/.gitconfig"
-    dest: "~/.gitconfig"
+    src: /Volumes/Shuroo/.gitconfig
+    dest: ~/.gitconfig
   when:
     - source_gitconfig.stat.exists
     - not target_gitconfig.stat.exists
@@ -69,5 +70,41 @@
   when:
     - git_user_email
     - git_user_email_result.stdout != git_user_email
+
+- name: Register source private key
+  stat:
+    path: /Volumes/Shuroo/.ssh/id_rsa
+  register: source_id_rsa
+
+- name: Register target private key
+  stat:
+    path: ~/.ssh/id_rsa
+  register: target_id_rsa
+
+- name: Register target ssh directory
+  stat:
+    path: ~/.ssh/
+  register: target_ssh
+
+- name: Create target ssh directory
+  become: false
+  file:
+    path: ~/.ssh/
+    state: directory
+    mode: 0700
+  when:
+    - source_id_rsa.stat.exists
+    - not target_id_rsa.stat.exists
+    - not target_ssh.stat.exists
+
+- name: Copy source private key
+  become: false
+  copy:
+    src: /Volumes/Shuroo/.ssh/id_rsa
+    dest: ~/.ssh/id_rsa
+    mode: 0600
+  when:
+    - source_id_rsa.stat.exists
+    - not target_id_rsa.stat.exists
 
 ...
