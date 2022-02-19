@@ -1,0 +1,24 @@
+custom source gitconfig file = {{ custom_source_gitconfig.stat.exists }}
+default source gitconfig file = {{ default_source_gitconfig.stat.exists }}
+target gitconfig file = {{ target_gitconfig.stat.exists }}
+{% if git_user_name is defined %}
+git user name = {{ git_user_name }}
+{% else %}
+git user name = undefined
+{% endif %}
+{% if git_user_email is defined %}
+git user email = {{ git_user_email }}
+{% else %}
+git user email = undefined
+{% endif %}
+source id_rsa file = {{ source_id_rsa.stat.exists }}
+target id_rsa file = {{ target_id_rsa.stat.exists }}
+{% if git_user_name is defined and
+      git_user_email is defined and
+      source_id_rsa.stat.exists %}
+Your ssh connection to github.com has been configured, and you can now
+{%  else %}
+Your ssh connection to github.com has not been configured.
+When you have completed this configuration, you can
+{%  endif %}
+test your connection with `ssh -T git@github.com`.

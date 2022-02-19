@@ -1,9 +1,10 @@
 ---
 
-# Default values are empty
-# Existing values on the target machine are NOT deleted, they are only
-# set when a value is provided in the playbook.
-git_user_name:
-git_user_email:
+# Don't create a log file
+write_log_file: false
+# Don't overwrite ~/.gitconfig file if it exists
+overwrite_gitconfig: false
+# Don't overwrite ~/.ssh/id_rsa file if it exists
+overwrite_private_key: false
 
 ...

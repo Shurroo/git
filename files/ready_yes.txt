@@ -1,0 +1,2 @@
+Your ssh connection to github.com has been configured, and you can now
+test your connection with `ssh -T git@github.com`.

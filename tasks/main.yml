@@ -23,31 +23,65 @@
   with_items:
     - git
     - git-extras
-  when:
-    - false  # Added to speed up testing only - remove before commit
-    - homebrew_brew.stat.exists
 
-- name: Register source gitconfig
+- name: Register custom source gitconfig
   stat:
-    path: /Volumes/Shuroo/.gitconfig
-  register: source_gitconfig
+    path: /Volumes/Shurroo/git/.gitconfig
+  register: custom_source_gitconfig
+
+- name: Register default source gitconfig
+  stat:
+    path: ~/.shurroo/roles/git/files/.gitconfig
+  register: default_source_gitconfig
 
 - name: Register target gitconfig
   stat:
     path: ~/.gitconfig
   register: target_gitconfig
 
-- name: Copy source gitconfig
+- name: Print custom gitconfig source status
+  ansible.builtin.debug:
+    var: custom_source_gitconfig.stat.exists
+    verbosity: 2
+
+- name: Print default gitconfig source status
+  ansible.builtin.debug:
+    var: default_source_gitconfig.stat.exists
+    verbosity: 2
+
+- name: Print gitconfig target status
+  ansible.builtin.debug:
+    var: target_gitconfig.stat.exists
+    verbosity: 2
+
+- name: Print gitconfig overwrite status
+  ansible.builtin.debug:
+    var: overwrite_gitconfig
+    verbosity: 2
+
+- name: Print (not target or overwrite) status
+  ansible.builtin.debug:
+    var: (not target_gitconfig.stat.exists or overwrite_gitconfig)
+    verbosity: 2
+
+- name: Copy custom source gitconfig
   become: false
   copy:
-    src: /Volumes/Shuroo/.gitconfig
+    src: /Volumes/Shurroo/git/.gitconfig
     dest: ~/.gitconfig
-  when:
-    - source_gitconfig.stat.exists
-    - not target_gitconfig.stat.exists
+  when: custom_source_gitconfig.stat.exists and 
+        (not target_gitconfig.stat.exists or overwrite_gitconfig)
+  register: copy_custom_result
+
+- name: Copy default source gitconfig
+  become: false
+  copy:
+    src: ~/.shurroo/roles/git/files/.gitconfig
+    dest: ~/.gitconfig
+  when: not copy_custom_result is succeeded and default_source_gitconfig.stat.exists and 
+        (not target_gitconfig.stat.exists or overwrite_gitconfig)
 
 - name: Register git user name
-  become: false
   shell: git config --global --get user.name
   register: git_user_name_result
   changed_when: false
@@ -59,27 +93,47 @@
   changed_when: false
   failed_when: false
 
+- name: Print git user name status
+  debug:
+    msg: "git user name = {{ git_user_name is defined }}"
+    verbosity: 2
+
+- name: Print git user email status
+  debug:
+    msg: "git user email = {{ git_user_email is defined }}"
+    verbosity: 2
+
 - name: Set git user name
   shell: git config --global user.name "{{git_user_name}}"
   when:
-    - git_user_name
+    - git_user_name is defined
     - git_user_name_result.stdout != git_user_name
 
 - name: Set git user email
   shell: git config --global user.email "{{git_user_email}}"
   when:
-    - git_user_email
+    - git_user_email is defined
     - git_user_email_result.stdout != git_user_email
 
 - name: Register source private key
   stat:
-    path: /Volumes/Shuroo/.ssh/id_rsa
+    path: /Volumes/Shurroo/git/.ssh/id_rsa
   register: source_id_rsa
 
 - name: Register target private key
   stat:
     path: ~/.ssh/id_rsa
   register: target_id_rsa
+
+- name: Print private key source status
+  ansible.builtin.debug:
+    var: source_id_rsa.stat.exists
+    verbosity: 2
+
+- name: Print private key target status
+  ansible.builtin.debug:
+    var: target_id_rsa.stat.exists
+    verbosity: 2
 
 - name: Register target ssh directory
   stat:
@@ -100,11 +154,37 @@
 - name: Copy source private key
   become: false
   copy:
-    src: /Volumes/Shuroo/.ssh/id_rsa
+    src: /Volumes/Shurroo/git/.ssh/id_rsa
     dest: ~/.ssh/id_rsa
     mode: 0600
+  when: source_id_rsa.stat.exists and 
+        (not target_id_rsa.stat.exists or overwrite_private_key)
+
+- name: Log results
+  template:
+    src: git.log.j2
+    dest: $HOME/.shurroo/log/git-{{ log_time }}.log
+  when: write_log_file
+  changed_when: false
+
+- name: Register log status
+  # Set to "log_no.txt" message in vars
+  # Change to "log_yes.txt" message when write_log_file
+  set_fact: log_status="log_yes.txt"
+  when: write_log_file
+  changed_when: false
+
+- name: Register next steps
+  # Set to "ready_no.txt" message in vars
+  # Change to "ready_yes.txt" message when all conditions are met
+  set_fact: next_steps="ready_yes.txt"
   when:
+    - git_user_name is defined
+    - git_user_email is defined
     - source_id_rsa.stat.exists
-    - not target_id_rsa.stat.exists
+
+- name: Next steps
+  debug:
+    msg: "{{ lookup('file', log_status, rstrip=false) }}{{ lookup('file', next_steps, rstrip=false) }}"
 
 ...

@@ -1,0 +1,3 @@
+Your ssh connection to github.com has not been configured.
+When you have completed this configuration, you can
+test your connection with `ssh -T git@github.com`.
